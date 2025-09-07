@@ -1,110 +1,87 @@
 // ==========================
 // VARIABLES GLOBALES
 // ==========================
+const gameContainer = document.getElementById("game-container");
+const player = document.getElementById("player");
+const scoreElement = document.getElementById("score");
+const levelElement = document.getElementById("level");
+const livesElement = document.getElementById("lives");
 
-// Referencias a los elementos del DOM (HTML)
-const gameContainer = document.getElementById("game-container"); // Contenedor principal del juego
-const player = document.getElementById("player");               // Nave del jugador
-const scoreElement = document.getElementById("score");          // Puntuación
-const levelElement = document.getElementById("level");          // Nivel actual
-const livesElement = document.getElementById("lives");          // Vidas
-
-// Botones de selección de dificultad
 const easyBtn = document.getElementById("easy-btn");
 const mediumBtn = document.getElementById("medium-btn");
 const hardBtn = document.getElementById("hard-btn");
 
-// Variables de control de movimiento del jugador
 let moveLeft = false;
 let moveRight = false;
 let shooting = false;
 
-// Arrays para almacenar enemigos y balas
 let enemies = [];
 let bullets = [];
 let enemyBullets = [];
 
-// Variables del estado del juego
 let score = 0;
 let level = 1;
 let lives = 3;
 
-// Velocidades y dirección
-let enemySpeed = 2;        // Velocidad horizontal de los enemigos
-let enemyDirection = 1;    // Dirección de movimiento (1 = derecha, -1 = izquierda)
-let playerSpeed = 10;      // Velocidad del jugador
-let bulletSpeed = 12;      // Velocidad de bala del jugador
-let enemyBulletSpeed = 10; // Velocidad de bala del enemigo
+let enemySpeed = 2;
+let enemyDirection = 1;
+let playerSpeed = 10;
+let bulletSpeed = 12;
+let enemyBulletSpeed = 10;
 
-// Intervalos para los bucles del juego
 let gameLoopInterval;
 let enemyShootInterval;
 
-// Dificultad seleccionada (por defecto fácil)
 let difficulty = "easy";
 
 // ==========================
 // SONIDOS
 // ==========================
-
-// Sonido de disparo del jugador
-const shootSound = new Audio("shoot.wav"); 
-// Sonido de explosión al matar a un enemigo
-const explosionSound = new Audio("explosion.mp3");
-// Música de fondo del juego
+const shootSound = new Audio("shoot.wav");
+const enemyHitSound = new Audio("explosion.wav");
 const backgroundMusic = new Audio("musica-de-fondo.mp3");
-// Música al perder la partida
 const gameOverMusic = new Audio("gameover.mp3");
 
-// Configuración de sonidos
-backgroundMusic.loop = true;    // Música en bucle
-backgroundMusic.volume = 0.5;   // Volumen moderado
-gameOverMusic.volume = 0.7;     // Volumen más alto para game over
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.5;
+gameOverMusic.volume = 0.7;
 
 // ==========================
 // INICIAR JUEGO
 // ==========================
 function startGame() {
-  // Ocultar la pantalla de inicio
   document.getElementById("start-screen").classList.add("hidden");
 
-  // Ajustar la velocidad según dificultad
+  // Ajustar velocidad según dificultad
   switch(difficulty){
-    case "easy": enemySpeed=1.5; bulletSpeed=12; break;
-    case "medium": enemySpeed=2.5; bulletSpeed=14; break;
-    case "hard": enemySpeed=3.5; bulletSpeed=16; break;
+    case "easy": enemySpeed = 1.5; bulletSpeed = 12; break;
+    case "medium": enemySpeed = 2.5; bulletSpeed = 14; break;
+    case "hard": enemySpeed = 3.5; bulletSpeed = 16; break;
   }
 
-  // Resetear variables
-  score = 0; 
-  level = 1; 
-  lives = 3;
+  score = 0; level = 1; lives = 3;
   updateHUD();
   createEnemies();
 
-  // Limpiar intervalos previos
   clearInterval(gameLoopInterval);
   clearInterval(enemyShootInterval);
 
-  // Iniciar bucles del juego
   gameLoopInterval = setInterval(gameLoop, 100);
   enemyShootInterval = setInterval(enemyShoot, 2000);
 
-  // Reproducir música de fondo
   backgroundMusic.play();
 
-  // Activar controles de teclado
   document.addEventListener("keydown", keyDownHandler);
   document.addEventListener("keyup", keyUpHandler);
 }
 
 // ==========================
-// BOTONES DE DIFICULTAD
+// BOTONES DIFICULTAD
 // ==========================
-[easyBtn, mediumBtn, hardBtn].forEach(btn=>{
+[easyBtn, mediumBtn, hardBtn].forEach(btn => {
   btn.addEventListener("click", ()=>{
-    difficulty = btn.dataset.difficulty; // Guardar dificultad elegida
-    startGame(); // Iniciar juego
+    difficulty = btn.dataset.difficulty;
+    startGame();
   });
 });
 
@@ -112,23 +89,20 @@ function startGame() {
 // CREAR ENEMIGOS
 // ==========================
 function createEnemies() {
-  // Borrar enemigos anteriores
-  enemies.forEach(e=>e.remove());
+  enemies.forEach(e => e.remove());
   enemies = [];
 
-  // Detectar si es móvil para ajustar columnas
   const isMobile = window.innerWidth <= 600;
-  let rows = 4;  
-  let cols = isMobile ? Math.min(5+level, 10) : Math.min(8+level, 12);
+  let rows = 4;
+  let cols = isMobile ? Math.min(5 + level, 10) : Math.min(8 + level, 12);
 
-  // Crear matriz de enemigos
-  for(let row=0; row<rows; row++){
-    for(let col=0; col<cols; col++){
+  for(let row = 0; row < rows; row++){
+    for(let col = 0; col < cols; col++){
       const enemy = document.createElement("div");
-      const types=["enemy-amarillo","enemy-azul","enemy-rojo","enemy-violeta"];
-      enemy.classList.add("enemy", types[Math.floor(Math.random()*types.length)]);
-      enemy.style.top = `${row*50}px`;
-      enemy.style.left = `${col*50}px`;
+      const types = ["enemy-amarillo","enemy-azul","enemy-rojo","enemy-violeta"];
+      enemy.classList.add("enemy", types[Math.floor(Math.random() * types.length)]);
+      enemy.style.top = `${row * 50}px`;
+      enemy.style.left = `${col * 50}px`;
       gameContainer.appendChild(enemy);
       enemies.push(enemy);
     }
@@ -139,111 +113,98 @@ function createEnemies() {
 // BUCLE PRINCIPAL
 // ==========================
 function gameLoop(){
-  movePlayer();        // Mover jugador
-  moveBullets();       // Mover balas del jugador
-  moveEnemies();       // Mover enemigos
-  moveEnemyBullets();  // Mover balas enemigas
-  checkCollisions();   // Revisar colisiones
+  movePlayer();
+  moveBullets();
+  moveEnemies();
+  moveEnemyBullets();
+  checkCollisions();
 }
 
 // ==========================
-// MOVIMIENTO DEL JUGADOR
+// MOVIMIENTO JUGADOR
 // ==========================
 function movePlayer(){
-  if(moveLeft && player.offsetLeft>0) 
-    player.style.left=`${player.offsetLeft-playerSpeed}px`;
-  if(moveRight && player.offsetLeft+player.offsetWidth<gameContainer.offsetWidth) 
-    player.style.left=`${player.offsetLeft+playerSpeed}px`;
+  if(moveLeft && player.offsetLeft > 0) player.style.left = `${player.offsetLeft - playerSpeed}px`;
+  if(moveRight && player.offsetLeft + player.offsetWidth < gameContainer.offsetWidth)
+      player.style.left = `${player.offsetLeft + playerSpeed}px`;
 }
 
 // ==========================
-// EVENTOS DE TECLADO
+// EVENTOS TECLADO
 // ==========================
 function keyDownHandler(e){
-  if(e.key==="ArrowLeft") moveLeft=true;
-  if(e.key==="ArrowRight") moveRight=true;
-  if(e.key===" ") shoot();
+  if(e.key === "ArrowLeft") moveLeft = true;
+  if(e.key === "ArrowRight") moveRight = true;
+  if(e.key === " ") shoot();
 }
 function keyUpHandler(e){
-  if(e.key==="ArrowLeft") moveLeft=false;
-  if(e.key==="ArrowRight") moveRight=false;
+  if(e.key === "ArrowLeft") moveLeft = false;
+  if(e.key === "ArrowRight") moveRight = false;
 }
 
 // ==========================
-// DISPARO DEL JUGADOR
+// DISPARO JUGADOR
 // ==========================
 function shoot(){
-  if(shooting) return; // Evitar disparos múltiples seguidos
-  shooting=true;
+  if(shooting) return;
+  shooting = true;
 
-  // Crear bala
-  const bullet=document.createElement("div");
+  const bullet = document.createElement("div");
   bullet.classList.add("bullet");
-  bullet.style.left=`${player.offsetLeft+player.offsetWidth/2-2}px`;
-  bullet.style.top=`${player.offsetTop}px`;
+  bullet.style.left = `${player.offsetLeft + player.offsetWidth/2 - 2}px`;
+  bullet.style.top = `${player.offsetTop}px`;
   gameContainer.appendChild(bullet);
   bullets.push(bullet);
 
-  // Reproducir sonido
   shootSound.play();
 
-  // Tiempo de recarga de disparo
-  setTimeout(()=>shooting=false,300);
+  setTimeout(()=>shooting = false, 300);
 }
 
 // ==========================
-// MOVIMIENTO DE BALAS JUGADOR
+// MOVIMIENTO BALAS JUGADOR
 // ==========================
 function moveBullets(){
   bullets.forEach((b,i)=>{
-    b.style.top=`${b.offsetTop-bulletSpeed}px`;
-    if(b.offsetTop<0){
+    b.style.top = `${b.offsetTop - bulletSpeed}px`;
+    if(b.offsetTop < 0){
       b.remove(); bullets.splice(i,1);
     }
   });
 }
 
 // ==========================
-// MOVIMIENTO DE ENEMIGOS
+// MOVIMIENTO ENEMIGOS (horizontal y bajan línea al tocar lateral)
 // ==========================
 function moveEnemies(){
-  let hitEdge=false;
+  let hitEdge = false;
 
-  // Mover horizontalmente
   enemies.forEach(enemy=>{
-    enemy.style.left=`${enemy.offsetLeft+enemySpeed*enemyDirection}px`;
-    if(enemy.offsetLeft<=0 || enemy.offsetLeft+enemy.offsetWidth>=gameContainer.offsetWidth){
-      hitEdge=true;
+    enemy.style.left = `${enemy.offsetLeft + enemySpeed * enemyDirection}px`;
+    if(enemy.offsetLeft <= 0 || enemy.offsetLeft + enemy.offsetWidth >= gameContainer.offsetWidth){
+      hitEdge = true;
     }
   });
 
   if(hitEdge){
-    // Cambiar dirección al llegar al borde
-    enemyDirection*=-1;
-
+    enemyDirection *= -1; // Cambiar dirección
+    // Baja una línea solo
     enemies.forEach(enemy=>{
-      enemy.style.top=`${enemy.offsetTop+15}px`; // SOLO baja una fila
-      // Si llegan demasiado abajo → rebote hacia arriba
-      if(enemy.offsetTop+enemy.offsetHeight>=gameContainer.offsetHeight-100){
-        enemy.style.top=`${enemy.offsetTop-30}px`;
-      }
+      enemy.style.top = `${enemy.offsetTop + 15}px`;
     });
   }
-
-  // Eliminar enemigos muertos del array
-  enemies=enemies.filter(e=>e.isConnected);
 }
 
 // ==========================
-// DISPARO DE ENEMIGOS
+// DISPARO ENEMIGOS
 // ==========================
 function enemyShoot(){
-  if(enemies.length===0) return;
-  const randomEnemy = enemies[Math.floor(Math.random()*enemies.length)];
-  const bullet=document.createElement("div");
+  if(enemies.length === 0) return;
+  const randomEnemy = enemies[Math.floor(Math.random() * enemies.length)];
+  const bullet = document.createElement("div");
   bullet.classList.add("enemy-bullet");
-  bullet.style.left=`${randomEnemy.offsetLeft+randomEnemy.offsetWidth/2-2}px`;
-  bullet.style.top=`${randomEnemy.offsetTop+randomEnemy.offsetHeight}px`;
+  bullet.style.left = `${randomEnemy.offsetLeft + randomEnemy.offsetWidth/2 - 2}px`;
+  bullet.style.top = `${randomEnemy.offsetTop + randomEnemy.offsetHeight}px`;
   gameContainer.appendChild(bullet);
   enemyBullets.push(bullet);
 }
@@ -253,8 +214,8 @@ function enemyShoot(){
 // ==========================
 function moveEnemyBullets(){
   enemyBullets.forEach((b,i)=>{
-    b.style.top=`${b.offsetTop+enemyBulletSpeed}px`;
-    if(b.offsetTop>gameContainer.offsetHeight){
+    b.style.top = `${b.offsetTop + enemyBulletSpeed}px`;
+    if(b.offsetTop > gameContainer.offsetHeight){
       b.remove(); enemyBullets.splice(i,1);
     }
   });
@@ -264,50 +225,51 @@ function moveEnemyBullets(){
 // COLISIONES
 // ==========================
 function checkCollisions(){
-  // Colisión balas del jugador con enemigos
   bullets.forEach((b,bIndex)=>{
     enemies.forEach((e,eIndex)=>{
       if(isColliding(b,e)){
-        score+=100; updateHUD();
-        explosionSound.play(); // Sonido explosión
+        score += 100;
+        updateHUD();
+        enemyHitSound.play();
         e.remove(); enemies.splice(eIndex,1);
         b.remove(); bullets.splice(bIndex,1);
       }
     });
   });
 
-  // Colisión balas enemigas con jugador
   enemyBullets.forEach((b,i)=>{
     if(isColliding(b,player)){
-      lives--; updateHUD();
+      lives--;
+      updateHUD();
       b.remove(); enemyBullets.splice(i,1);
-      if(lives<=0) endGame();
+      if(lives <= 0) endGame();
     }
   });
 
-  // Pasar de nivel al eliminar a todos los enemigos
-  if(enemies.length===0){
-    level++; updateHUD(); createEnemies();
+  if(enemies.length === 0){
+    level++;
+    updateHUD();
+    createEnemies();
   }
 }
 
 // ==========================
-// DETECTAR COLISIÓN
+// DETECTAR COLISION
 // ==========================
 function isColliding(a,b){
-  return !(a.offsetTop+a.offsetHeight<b.offsetTop ||
-           a.offsetTop>b.offsetTop+b.offsetHeight ||
-           a.offsetLeft+a.offsetWidth<b.offsetLeft ||
-           a.offsetLeft>b.offsetLeft+b.offsetWidth);
+  return !(a.offsetTop + a.offsetHeight < b.offsetTop ||
+           a.offsetTop > b.offsetTop + b.offsetHeight ||
+           a.offsetLeft + a.offsetWidth < b.offsetLeft ||
+           a.offsetLeft > b.offsetLeft + b.offsetWidth);
 }
 
 // ==========================
 // ACTUALIZAR HUD
 // ==========================
 function updateHUD(){
-  scoreElement.textContent=score;
-  levelElement.textContent=level;
-  livesElement.textContent=lives;
+  scoreElement.textContent = score;
+  levelElement.textContent = level;
+  livesElement.textContent = lives;
 }
 
 // ==========================
@@ -316,9 +278,11 @@ function updateHUD(){
 function endGame(){
   clearInterval(gameLoopInterval);
   clearInterval(enemyShootInterval);
-  backgroundMusic.pause();  // Parar música de fondo
-  gameOverMusic.play();     // Reproducir música de Game Over
-  alert("¡Game Over! Tu puntuación: "+score);
-  location.reload();        // Reiniciar juego
+  backgroundMusic.pause();
+  gameOverMusic.play();
+  alert("¡Game Over! Tu puntuación: " + score);
+  location.reload();
 }
+
+
 
