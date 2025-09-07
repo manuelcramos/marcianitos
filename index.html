@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Space Invaders</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Pantalla de selección de dificultad -->
+  <div id="start-screen" class="screen">
+    <h1>🚀 Space Invaders</h1>
+    <!-- Botones con IDs agregados para que el JS los detecte -->
+    <button id="easy-btn" class="difficulty-btn" data-difficulty="easy">Fácil</button>
+    <button id="medium-btn" class="difficulty-btn" data-difficulty="medium">Medio</button>
+    <button id="hard-btn" class="difficulty-btn" data-difficulty="hard">Difícil</button>
+  </div>
+
+  <!-- Contenedor principal del juego -->
+  <div id="game-container">
+    <!-- Nave del jugador -->
+    <div id="player"></div>
+  </div>
+
+  <!-- HUD con información del juego -->
+  <div id="hud">
+    <p>🎯 Puntos: <span id="score">0</span></p>
+    <p>📈 Nivel: <span id="level">1</span></p>
+    <p>❤️ Vidas: <span id="lives">3</span></p>
+  </div>
+
+  <!-- Pantalla de Game Over -->
+  <div id="game-over-screen" class="screen hidden">
+    <h2>¡Game Over!</h2>
+    <button onclick="location.reload()">Reintentar</button>
+  </div>
+
+  <!-- Pantalla de Victoria -->
+  <div id="win-screen" class="screen hidden">
+    <h2>¡Has ganado!</h2>
+    <button onclick="location.reload()">Volver a jugar</button>
+  </div>
+
+  <!-- Controles táctiles móviles -->
+  <div class="touch-controls">
+    <button id="left-btn">⬅️</button>
+    <button id="shoot-btn">🔫</button>
+    <button id="right-btn">➡️</button>
+  </div>
+
+  <!-- Script principal -->
+  <script src="script.js"></script>
+  <footer class="footer">
+  © 2025 Manuel C. Ramos Todos los derechos reservados.
+</footer>
+
+
+</body>
+</html>
+
+
+

@@ -1,0 +1,196 @@
+/* ==========================
+   Reset general y estilos básicos
+========================== */
+* {
+  margin: 0;           /* Eliminar márgenes por defecto de todos los elementos */
+  padding: 0;          /* Eliminar padding por defecto de todos los elementos */
+  box-sizing: border-box; /* Incluir padding y border en el ancho y alto total */
+}
+
+/* ==========================
+   Estilos del body
+========================== */
+body {
+  background-color: rgb(71, 71, 71); /* Fondo oscuro */
+  font-family: 'Arial', sans-serif;  /* Tipografía clara y legible */
+  color: white;                       /* Color de texto por defecto */
+  overflow: hidden;                   /* Evitar scroll de la página */
+}
+
+/* ==========================
+   Pantallas de inicio, victoria y game over
+========================== */
+.screen {
+  position: absolute;                 /* Posicionamiento relativo a la ventana */
+  top: 50%;                           /* Centrar verticalmente */
+  left: 50%;                          /* Centrar horizontalmente */
+  transform: translate(-50%, -50%);  /* Ajuste exacto de centrado */
+  text-align: center;                 /* Centrar el texto */
+  z-index: 10;                        /* Para estar encima del juego */
+}
+
+/* Ocultar pantallas por defecto */
+.hidden {
+  display: none;                      /* Pantalla no visible hasta activarse */
+}
+
+/* ==========================
+   Botones de dificultad
+========================== */
+.difficulty-btn {
+  display: block;                     /* Botón ocupa toda la línea */
+  margin: 10px auto;                  /* Separación superior e inferior, centrado horizontal */
+  padding: 10px 20px;                 /* Espaciado interno del botón */
+  font-size: 18px;                    /* Tamaño de letra */
+  background-color: #00f;             /* Color de fondo azul */
+  color: white;                       /* Color de texto */
+  border: none;                       /* Sin borde */
+  border-radius: 8px;                 /* Bordes redondeados */
+  cursor: pointer;                    /* Cursor tipo puntero al pasar el ratón */
+  transition: 0.3s;                   /* Transición suave al hover */
+}
+
+/* Efecto al pasar el mouse sobre el botón */
+.difficulty-btn:hover {
+  background-color: #0055ff;          /* Azul más oscuro */
+}
+
+/* ==========================
+   Contenedor principal del juego
+========================== */
+#game-container {
+  position: relative;                 /* Contenedor relativo para posicionar enemigos y jugador */
+  width: 100%;                        /* Ocupa todo el ancho disponible */
+  max-width: 600px;                   /* Máximo ancho */
+  height: 700px;                      /* Altura del juego en PC */
+  margin: 0 auto;                     /* Centrado horizontal */
+  background: rgb(247, 188, 188) url('assets/stars.gif') repeat; /* Fondo con GIF de estrellas */
+  background-size: cover;             /* Cubrir todo el contenedor */
+  overflow: hidden;                   /* Evitar que elementos se salgan */
+  border: 3px solid #555;             /* Borde gris */
+}
+
+/* ==========================
+   Nave del jugador
+========================== */
+#player {
+  width: 50px;                        /* Ancho de la nave */
+  height: 50px;                       /* Alto de la nave */
+  position: absolute;                  /* Posicionamiento dentro del contenedor */
+  bottom: 10px;                        /* 10px desde la parte inferior */
+  left: 50%;                           /* Centrar horizontalmente */
+  transform: translateX(-50%);         /* Ajuste exacto para centrar */
+  background-image: url(../marcianitos/nave.png); /* Imagen de la nave */
+  background-size: cover;              /* Cubrir todo el div */
+  z-index: 2;                          /* Estar por encima del fondo pero debajo de HUD */
+}
+
+/* ==========================
+   Enemigos
+========================== */
+.enemy-amarillo,
+.enemy-azul,
+.enemy-rojo,
+.enemy-violeta {
+  width: 40px;                         /* Ancho del enemigo */
+  height: 40px;                        /* Alto del enemigo */
+  position: absolute;                   /* Posicionamiento dentro del contenedor */
+  background-size: cover;               /* Imagen completa dentro del div */
+  transition: transform 0.2s ease;     /* Movimiento suave al moverse */
+  animation: blink 1s infinite;         /* Animación de parpadeo o sacudida */
+}
+
+/* Imagen específica según color */
+.enemy-amarillo { background-image: url('../marcianitos/fantasma-amarillo.PNG'); }
+.enemy-azul { background-image: url('../marcianitos/fantasma-azul.PNG'); }
+.enemy-rojo { background-image: url('../marcianitos/fantasma-rojo.PNG'); }
+.enemy-violeta { background-image: url('../marcianitos/fantasma-violeta.PNG'); }
+
+/* Animación de parpadeo/sacudida de enemigos */
+@keyframes blink {
+  0%, 100% { transform: translateX(0); } /* Posición normal */
+  50% { transform: translateX(3px); }    /* Sacudida lateral */
+}
+
+/* ==========================
+   Balas
+========================== */
+.bullet {
+  width: 5px;                          /* Ancho bala jugador */
+  height: 15px;                         /* Alto bala jugador */
+  background-color: red;                 /* Color rojo */
+  position: absolute;                    /* Posicionamiento dentro del contenedor */
+  z-index: 5;                            /* Por encima del jugador y enemigos */
+}
+
+.enemy-bullet {
+  width: 5px;                            /* Ancho bala enemigo */
+  height: 15px;                           /* Alto bala enemigo */
+  background-color: yellow;               /* Color amarillo */
+  position: absolute;
+  z-index: 5;
+}
+
+/* ==========================
+   Panel HUD superior
+========================== */
+#hud {
+ display: flex;                         /* Distribución flexible */
+ justify-content: space-around;         /* Espacio uniforme entre elementos */
+ margin-top: 10px;                       /* Separación superior */
+ font-size: 18px;                        /* Tamaño de texto */
+ color: #0f0;                             /* Verde estilo arcade */
+ text-shadow: 0 0 5px #0f0;              /* Efecto luminoso */
+ font-family: "Press Start 2P", monospace, sans-serif; /* Fuente arcade */
+}
+
+/* ==========================
+   Controles táctiles inferiores
+========================== */
+.touch-controls {
+  position: fixed;                        /* Fijos en pantalla */
+  bottom: 10px;                           /* 10px desde abajo */
+  left: 50%;                              
+  transform: translateX(-50%);           /* Centrado horizontal */
+  display: flex;                          /* Distribución horizontal */
+  gap: 10px;                              /* Separación entre botones */
+  z-index: 20;                             /* Por encima de todo */
+}
+
+.touch-controls button {
+  padding: 15px 20px;                     /* Espaciado interno */
+  font-size: 24px;                        /* Tamaño de letra grande para tocar */
+  background-color: #222;                 /* Color de fondo oscuro */
+  color: white;                            /* Texto blanco */
+  border: 2px solid #555;                 /* Borde gris */
+  border-radius: 12px;                     /* Bordes redondeados */
+  cursor: pointer;                         /* Cursor puntero */
+}
+
+/* Evitar selección accidental */
+button {
+  user-select: none;
+}
+
+/* ==========================
+   Responsive para móviles
+========================== */
+@media (max-width: 600px) {
+  #game-container { height: 500px; }           /* Altura menor para móviles */
+  .touch-controls button {                      /* Botones más pequeños */
+    padding: 10px 15px;
+    font-size: 20px;
+  }
+}
+
+/* ==========================
+   Footer
+========================== */
+.footer {
+  text-align: center;                      /* Centrar texto */
+  font-size: 0.8rem;                       /* Tamaño más pequeño */
+  color: #aaa;                              /* Gris tenue */
+  margin-top: 20px;                         /* Separación superior */
+  padding: 10px 0;                          /* Espaciado interno */
+}
+
